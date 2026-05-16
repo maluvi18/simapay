@@ -131,6 +131,7 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 <div class="menu-header">Data Transaksi</div>
 <a @click="go('pendapatan')" :class="['nav-link', view === 'pendapatan' ? 'active' : '']"><i class="fa-solid fa-coins text-success"></i> Pendapatan Lain</a>
 <a @click="go('pembayaran_siswa')" :class="['nav-link', view === 'pembayaran_siswa' ? 'active' : '']"><i class="fa-solid fa-user-graduate text-success"></i> Riwayat Pembayaran</a>
+<a @click="go('tabungan')" :class="['nav-link', view === 'tabungan' ? 'active' : '']"><i class="fa-solid fa-piggy-bank text-info"></i> Data Tabungan Siswa</a>
 <a @click="go('pengeluaran')" :class="['nav-link', view === 'pengeluaran' ? 'active' : '']"><i class="fa-solid fa-cart-shopping text-danger"></i> Pengeluaran Kas</a>
 <a @click="go('utang_pegawai')" :class="['nav-link', view === 'utang_pegawai' ? 'active' : '']"><i class="fa-solid fa-file-invoice-dollar text-warning"></i> Utang Pegawai</a>
 
@@ -149,6 +150,7 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 <template v-if="session.role === 'siswa'">
 <div class="menu-header">Menu Siswa</div>
 <a @click="go('tagihan_siswa')" :class="['nav-link', view === 'tagihan_siswa' ? 'active' : '']"><i class="fa-solid fa-file-invoice-dollar text-warning"></i> Tagihan Saya</a>
+<a @click="go('tabungan')" :class="['nav-link', view === 'tabungan' ? 'active' : '']"><i class="fa-solid fa-piggy-bank text-info"></i> History Tabungan Saya</a>
 <a @click="go('pembayaran_siswa')" :class="['nav-link', view === 'pembayaran_siswa' ? 'active' : '']"><i class="fa-solid fa-clock-rotate-left text-success"></i> Riwayat Pembayaran</a>
 </template>
 <div class="mt-4 px-3 mb-4">
@@ -249,7 +251,7 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 <tbody>
 <tr v-for="row in group.details" :key="row[0]">
 <td><span class="badge bg-secondary"><i class="fa-solid fa-receipt me-1"></i>{{ row[3] }}</span></td>
-<td style="white-space: pre-wrap;">{{ row[4] }}</td>
+<td style="white-space: pre-wrap;">{{ row[4] }}<br><small class="text-info">{{ row[7] }}</small></td>
 <td class="text-success fw-bold">{{ formatRp(row[5]) }}</td>
 <td>{{ row[6] }}</td>
 <td v-if="session.role !== 'siswa'" class="text-center" style="white-space: nowrap;">
@@ -322,10 +324,13 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 </div>
 </div>
 
-<div v-show="['users', 'siswa', 'pendapatan', 'pengeluaran', 'utang_pegawai', 'jenis_pendapatan', 'kategori_pengeluaran'].includes(view)">
+<div v-show="['users', 'siswa', 'pendapatan', 'pengeluaran', 'utang_pegawai', 'jenis_pendapatan', 'kategori_pengeluaran', 'tabungan'].includes(view)">
 <div class="card-custom p-4">
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
-<h5 class="fw-bold text-capitalize m-0 mb-3 mb-md-0"><i class="fa-solid fa-table text-primary me-2"></i> Data {{ view.replace('_', ' ') }}</h5>
+<h5 class="fw-bold text-capitalize m-0 mb-3 mb-md-0">
+  <i v-if="view==='tabungan'" class="fa-solid fa-piggy-bank text-primary me-2"></i>
+  <i v-else class="fa-solid fa-table text-primary me-2"></i> Data {{ view.replace('_', ' ') }}
+</h5>
 <div class="d-flex gap-2">
 <button v-if="session.role !== 'siswa'" @click="openModal('add')" class="btn btn-primary btn-sm shadow-sm"><i class="fa-solid fa-circle-plus me-1"></i> Tambah Data</button>
 <button @click="exportExcel" class="btn btn-success btn-sm shadow-sm"><i class="fa-solid fa-file-excel me-1"></i> Export XLSX</button>
@@ -336,23 +341,23 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 <thead class="table-light">
 <tr>
 <th v-for="h in tableData.header" :key="h" class="text-uppercase text-muted small fw-bold">{{ h }}</th>
-<th v-if="session.role === 'admin'" class="text-center" style="width: 100px;">Aksi</th>
+<th v-if="session.role === 'admin' || (view === 'tabungan' && session.role === 'bendahara')" class="text-center" style="width: 100px;">Aksi</th>
 </tr>
 </thead>
 <tbody>
 <tr v-for="(row, rIdx) in tableData.body" :key="rIdx">
 <td v-for="(cell, cIdx) in row" :key="cIdx">
-<span v-if="(tableData.header[cIdx].toLowerCase().includes('jumlah') || tableData.header[cIdx].toLowerCase().includes('tagihan') || tableData.header[cIdx].toLowerCase().includes('utang') || tableData.header[cIdx].toLowerCase().includes('kurang') || tableData.header[cIdx].toLowerCase().includes('nominal') || (tableData.header[cIdx].toLowerCase().includes('bayar') && !tableData.header[cIdx].toLowerCase().includes('rincian') && !tableData.header[cIdx].toLowerCase().includes('tanggal') && !tableData.header[cIdx].toLowerCase().includes('tgl'))) && !isNaN(Number(cell)) && cell !== ''" class="fw-bold text-success">{{ formatRp(cell) }}</span>
+<span v-if="(tableData.header[cIdx].toLowerCase().includes('jumlah') || tableData.header[cIdx].toLowerCase().includes('tagihan') || tableData.header[cIdx].toLowerCase().includes('utang') || tableData.header[cIdx].toLowerCase().includes('kurang') || tableData.header[cIdx].toLowerCase().includes('nominal') || tableData.header[cIdx].toLowerCase().includes('saldo') || (tableData.header[cIdx].toLowerCase().includes('bayar') && !tableData.header[cIdx].toLowerCase().includes('rincian') && !tableData.header[cIdx].toLowerCase().includes('tanggal') && !tableData.header[cIdx].toLowerCase().includes('tgl'))) && !isNaN(Number(cell)) && cell !== ''" :class="Number(cell) < 0 ? 'fw-bold text-danger' : 'fw-bold text-success'">{{ formatRp(cell) }}</span>
 <span v-else-if="tableData.header[cIdx].toLowerCase().includes('password')" class="text-muted fst-italic">***</span>
 <span v-else>{{ cell }}</span>
 </td>
-<td v-if="session.role === 'admin'" class="text-center" style="white-space: nowrap;">
+<td v-if="session.role === 'admin' || (view === 'tabungan' && session.role === 'bendahara')" class="text-center" style="white-space: nowrap;">
 <button @click="openModal('edit', row)" class="btn btn-primary btn-action shadow-sm text-white" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
 <button @click="deleteData(row[0], view)" class="btn btn-danger btn-action shadow-sm text-white ms-1" title="Hapus"><i class="fa-solid fa-trash-can"></i></button>
 </td>
 </tr>
 <tr v-if="tableData.body.length === 0">
-<td :colspan="tableData.header.length + (session.role === 'admin' ? 1 : 0)" class="text-center text-muted p-4"><i class="fa-solid fa-folder-open fs-2 mb-2 d-block"></i>Data tidak tersedia.</td>
+<td :colspan="tableData.header.length + 1" class="text-center text-muted p-4"><i class="fa-solid fa-folder-open fs-2 mb-2 d-block"></i>Data tidak tersedia.</td>
 </tr>
 </tbody>
 </table>
@@ -540,6 +545,22 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 <label class="col-sm-3 col-form-label fw-bold">Tanggal Bayar</label>
 <div class="col-sm-9"><input type="date" class="form-control" v-model="formBayar.tglBayar"></div>
 </div>
+
+<div class="mb-3 row align-items-center">
+<label class="col-sm-3 col-form-label fw-bold">Metode Bayar</label>
+<div class="col-sm-9">
+<select class="form-select" v-model="formBayar.metode" :disabled="!formBayar.siswa">
+  <option value="Tunai">Tunai</option>
+  <option value="Transfer">Transfer Bank</option>
+  <option value="QRIS">QRIS / e-Wallet</option>
+  <option value="Potong Tabungan">Potong Tabungan Siswa</option>
+</select>
+<div v-if="formBayar.siswa" class="mt-2 p-2 rounded border" :class="formBayar.saldoSiswa >= totalTagihanCart ? 'bg-success bg-opacity-10 border-success text-success' : 'bg-danger bg-opacity-10 border-danger text-danger'">
+  <i class="fa-solid fa-piggy-bank me-1"></i> Saldo Tabungan: <strong>{{ formatRp(formBayar.saldoSiswa) }}</strong>
+</div>
+</div>
+</div>
+
 <div class="mb-3 row align-items-center">
 <label class="col-sm-3 col-form-label fw-bold">Rincian Tagihan</label>
 <div class="col-sm-9">
@@ -639,6 +660,11 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
           <option value="" disabled>Pilih {{ head }}...</option>
           <option v-for="j in listJenisPendapatan" :value="j">{{ j }}</option>
       </select>
+
+      <select v-else-if="head.toLowerCase().includes('nama') && view === 'tabungan'" v-model="modal.formData[i]" class="form-select bg-light">
+          <option value="" disabled>Pilih {{ head }}...</option>
+          <option v-for="s in listSiswa" :value="s.nama">{{ s.nama }} ({{ s.nis }})</option>
+      </select>
       
       <select v-else-if="(head.toLowerCase().includes('kategori') || head.toLowerCase().includes('jenis')) && view === 'pengeluaran'" v-model="modal.formData[i]" class="form-select bg-light">
           <option value="" disabled>Pilih {{ head }}...</option>
@@ -647,7 +673,9 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 
       <input v-else-if="head.toLowerCase().includes('tgl') || head.toLowerCase().includes('tanggal')" type="date" v-model="modal.formData[i]" class="form-control bg-light">
 
-      <input v-else v-model="modal.formData[i]" :type="head.toLowerCase().includes('password') ? 'password' : 'text'" class="form-control bg-light" :readonly="(i === 0 && modal.action === 'add') || (head.toLowerCase().includes('invoice') && modal.action === 'add')" :placeholder="(i === 0 && modal.action === 'add') || (head.toLowerCase().includes('invoice') && modal.action === 'add') ? 'Auto Generate' : 'Input ' + head">
+      <input v-else v-model="modal.formData[i]" :type="head.toLowerCase().includes('password') ? 'password' : (head.toLowerCase().includes('nominal') ? 'number' : 'text')" class="form-control bg-light" :readonly="(i === 0 && modal.action === 'add') || (head.toLowerCase().includes('invoice') && modal.action === 'add')" :placeholder="(i === 0 && modal.action === 'add') || (head.toLowerCase().includes('invoice') && modal.action === 'add') ? 'Auto Generate' : 'Input ' + head">
+      
+      <small v-if="head.toLowerCase().includes('nominal') && view === 'tabungan'" class="text-muted mt-1 d-block"><i class="fa-solid fa-circle-info"></i> Isi dengan angka minus (-) untuk Penarikan / Pengambilan.</small>
     </div>
   </template>
 
@@ -699,7 +727,7 @@ createApp({
       modalSiswa: { show: false, context: 'bayar' },
       modalTagihan: { show: false },
       listSiswa: [], listTagihanAktif: [],
-      formBayar: { invoice: '', tglBayar: getToday(), siswa: null, items: [] }
+      formBayar: { invoice: '', tglBayar: getToday(), siswa: null, items: [], metode: 'Tunai', saldoSiswa: 0 }
     }
   },
   computed: {
@@ -772,7 +800,11 @@ createApp({
         return await response.json();
       } catch (err) { throw new Error("Koneksi API gagal."); }
     },
-    formatRp(angka) { if(!angka || isNaN(angka)) return "0"; return Number(angka).toLocaleString('id-ID'); },
+    formatRp(angka) { if(!angka || isNaN(angka)) return "0"; 
+       const val = Number(angka);
+       if(val < 0) return "- Rp " + Math.abs(val).toLocaleString('id-ID');
+       return "Rp " + val.toLocaleString('id-ID'); 
+    },
     toast(title, icon = 'success') { Swal.fire({ toast: true, position: 'top-end', icon: icon, title: title, showConfirmButton: false, timer: 2000 }); },
     toggleHistory(nama) { this.expandedHistory = this.expandedHistory === nama ? null : nama; },
     toggleTagihan(nama) { this.expandedTagihan = this.expandedTagihan === nama ? null : nama; },
@@ -820,7 +852,7 @@ createApp({
 
       if(menu === 'dashboard') this.loadDashboard();
       else if (menu === 'pembayaran_siswa') this.fetchHistorySiswa();
-      else if(['users', 'siswa', 'tagihan_siswa', 'pendapatan', 'pengeluaran', 'utang_pegawai', 'jenis_pendapatan', 'kategori_pengeluaran'].includes(menu)) {
+      else if(['users', 'siswa', 'tagihan_siswa', 'pendapatan', 'pengeluaran', 'utang_pegawai', 'jenis_pendapatan', 'kategori_pengeluaran', 'tabungan'].includes(menu)) {
         this.fetchTableData();
       }
     },
@@ -884,11 +916,20 @@ createApp({
     },
 
     bukaModalBayar() {
-      this.formBayar = { invoice: this.generateInvoice(), tglBayar: getToday(), siswa: null, items: [] };
+      this.formBayar = { invoice: this.generateInvoice(), tglBayar: getToday(), siswa: null, items: [], metode: 'Tunai', saldoSiswa: 0 };
       this.searchSiswaInput = ''; 
       this.modalBayar.show = true;
     },
     
+    async fetchSaldoSiswa(namaSiswa) {
+      try {
+        const res = await this.apiCall('getSaldoTabungan', { namaSiswa: namaSiswa });
+        if(res.success) {
+          this.formBayar.saldoSiswa = res.saldo;
+        }
+      } catch(e) {}
+    },
+
     async bukaModalPilihSiswa(context) {
       this.modalSiswa.context = context;
       this.loading = true;
@@ -902,7 +943,11 @@ createApp({
     pilihSiswa(s) {
       this.searchSiswaInput = s.nama + ' (' + s.nis + ')'; 
       if(this.modalSiswa.context === 'bayar') {
-        this.formBayar.siswa = s; this.formBayar.items = [];
+        this.formBayar.siswa = s; 
+        this.formBayar.items = [];
+        this.formBayar.metode = 'Tunai';
+        this.formBayar.saldoSiswa = 0;
+        this.fetchSaldoSiswa(s.nama);
       } else {
         this.formBuatTagihan.siswa = s;
       }
@@ -924,8 +969,21 @@ createApp({
       this.modalTagihan.show = false;
     },
     async submitPembayaranSiswa() {
+      // Validasi Saldo jika potong tabungan
+      if(this.formBayar.metode === 'Potong Tabungan' && this.totalTagihanCart > this.formBayar.saldoSiswa) {
+          return Swal.fire('Saldo Tidak Mencukupi', 'Sisa saldo tabungan (' + this.formatRp(this.formBayar.saldoSiswa) + ') kurang dari tagihan yang harus dibayar.', 'error');
+      }
+
       this.loading = true;
-      const payload = { siswa: this.formBayar.siswa, invoice: this.formBayar.invoice, tglBayar: this.formBayar.tglBayar, items: this.formBayar.items, total: this.totalTagihanCart };
+      const payload = { 
+        siswa: this.formBayar.siswa, 
+        invoice: this.formBayar.invoice, 
+        tglBayar: this.formBayar.tglBayar, 
+        metode: this.formBayar.metode,
+        items: this.formBayar.items, 
+        total: this.totalTagihanCart 
+      };
+
       try {
         const res = await this.apiCall('prosesPembayaranSiswa', { payload: payload });
         this.loading = false;
@@ -943,6 +1001,11 @@ createApp({
         if(res.success) {
           this.tableData = { header: res.header, body: res.body };
           if(this.view === 'tagihan_siswa' && this.listKelas.length === 0) this.fetchDaftarKelas();
+          
+          if(this.view === 'tabungan' && this.listSiswa.length === 0) {
+             const resSiswa = await this.apiCall('getDaftarSiswa');
+             this.listSiswa = resSiswa;
+          }
         } else this.tableData = { header: [], body: [] };
       } catch(err) { this.loading = false; this.tableData = { header: [], body: [] }; }
     },
