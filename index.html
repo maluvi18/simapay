@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="id">
 <head>
-<title>Sistem Keuangan | SIMAPay Exclusive</title>
+<title>Sistem Keuangan | SIMPAY</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base target="_top">
@@ -92,7 +92,7 @@ html, body { height: auto !important; overflow: visible !important; background: 
 <div class="card card-custom p-4 shadow-lg" style="width: 350px;">
 <div class="text-center mb-4">
 <img src="https://lh3.googleusercontent.com/d/10vRut20sv3Oa6_Bx3TBq5lI1L9rbw-UQ" width="80" style="border-radius: 50%; margin-bottom: 10px;" onerror="this.src='https://via.placeholder.com/80/3498db/ffffff?text=BI'">
-<h5 class="mt-3 fw-bold text-primary">SIMAPay Exclusive</h5>
+<h5 class="mt-3 fw-bold text-primary">Login Sistem</h5>
 </div>
 <div class="mb-3">
 <div class="input-group">
@@ -109,7 +109,7 @@ html, body { height: auto !important; overflow: visible !important; background: 
 </div>
 <button @click="doLogin" class="btn btn-primary w-100 fw-bold shadow-sm" :disabled="loading">
 <span v-if="loading"><i class="fa-solid fa-circle-notch fa-spin me-2"></i> Memproses...</span>
-<span v-else><i class="fa-solid fa-right-to-bracket me-2"></i> MASUK</span>
+<span v-else><i class="fa-solid fa-right-to-bracket me-2"></i> MASUK KE SISTEM</span>
 </button>
 </div>
 </div>
@@ -118,7 +118,7 @@ html, body { height: auto !important; overflow: visible !important; background: 
 <div class="sidebar-overlay" :class="{'show': sidebarOpen}" @click="sidebarOpen = false"></div>
 <nav id="sidebar" :class="{'open': sidebarOpen}">
 <div class="sidebar-brand">
-<h6 class="fw-bold m-0 text-white"><i class="fa-solid fa-building-columns me-2"></i>SIMAPay Exclusive</h6>
+<h6 class="fw-bold m-0 text-white"><i class="fa-solid fa-building-columns me-2"></i>SIMPAY</h6>
 </div>
 <div class="text-center py-2 bg-dark" style="font-size:11px; color:#bbb;">
 Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-user-shield me-1"></i> {{ session.role }}</span>
@@ -233,7 +233,7 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 </div>
 <div class="table-responsive">
 <table class="table table-hover align-middle">
-<thead class="table-light"><tr><th style="width: 50px;"></th><th>Nama Siswa</th><th>Total Nominal Dibayar</th><th class="text-center" style="width: 140px;">Aksi</th></tr></thead>
+<thead class="table-light"><tr><th style="width: 50px;"></th><th>Nama Siswa</th><th>Total Nominal Dibayar</th><th class="text-center" style="width: 140px;">Aksi / Cetak</th></tr></thead>
 <tbody v-for="(group, gIdx) in filteredGroupedHistory" :key="group.nama">
 <tr class="row-parent" @click="toggleHistory(group.nama)">
 <td class="text-center text-primary"><i :class="expandedHistory === group.nama ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'"></i></td>
@@ -245,7 +245,7 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 <td colspan="4" class="p-0">
 <div class="row-child-container">
 <table class="table table-sm table-bordered bg-white mb-0">
-<thead class="bg-light"><tr><th>No. Invoice</th><th>Rincian Pembayaran</th><th>Nominal</th><th>Tanggal</th><th v-if="session.role !== 'siswa'" class="text-center">Edit/Cetak</th></tr></thead>
+<thead class="bg-light"><tr><th>No. Invoice</th><th>Rincian Pembayaran</th><th>Nominal</th><th>Tanggal</th><th v-if="session.role !== 'siswa'" class="text-center">Aksi / Cetak</th></tr></thead>
 <tbody>
 <tr v-for="row in group.details" :key="row[0]">
 <td><span class="badge bg-secondary"><i class="fa-solid fa-receipt me-1"></i>{{ row[3] }}</span></td>
@@ -253,9 +253,9 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 <td class="text-success fw-bold">{{ formatRp(row[5]) }}</td>
 <td>{{ row[6] }}</td>
 <td v-if="session.role !== 'siswa'" class="text-center" style="white-space: nowrap;">
-<button @click="openModal('edit', row)" class="btn btn-primary btn-action shadow-sm text-white" title="Edit Transaksi"><i class="fa-solid fa-pen-to-square"></i></button>
+<button v-if="session.role === 'admin'" @click="openModal('edit', row)" class="btn btn-primary btn-action shadow-sm text-white" title="Edit Transaksi"><i class="fa-solid fa-pen-to-square"></i></button>
 <button @click="doPrintInvoice(row)" class="btn btn-info btn-action shadow-sm text-white ms-1" title="Cetak Invoice Ini"><i class="fa-solid fa-print"></i></button>
-<button @click="deleteData(row[0], 'pendapatan')" class="btn btn-danger btn-action shadow-sm text-white ms-1" title="Hapus"><i class="fa-solid fa-trash-can"></i></button>
+<button v-if="session.role === 'admin'" @click="deleteData(row[0], 'pendapatan')" class="btn btn-danger btn-action shadow-sm text-white ms-1" title="Hapus"><i class="fa-solid fa-trash-can"></i></button>
 </td>
 </tr>
 </tbody>
@@ -296,14 +296,14 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 <td colspan="5" class="p-0">
 <div class="row-child-container" style="border-left-color: #f39c12;">
 <table class="table table-sm table-bordered bg-white mb-0">
-<thead class="bg-light"><tr><th>Rincian Pembayaran</th><th>Nilai Tagihan</th><th>Telah Dibayar</th><th>Sisa Tagihan</th><th v-if="session.role !== 'siswa'" class="text-center">Aksi</th></tr></thead>
+<thead class="bg-light"><tr><th>Rincian Pembayaran</th><th>Nilai Tagihan</th><th>Telah Dibayar</th><th>Sisa Tagihan</th><th v-if="session.role === 'admin'" class="text-center">Aksi</th></tr></thead>
 <tbody>
 <tr v-for="row in g.details" :key="row[0]">
 <td class="fw-bold">{{ row[3] }}</td>
 <td>{{ formatRp(row[4]) }}</td>
 <td class="text-success">{{ formatRp(row[5]) }}</td>
 <td class="text-danger fw-bold">{{ formatRp(row[6]) }}</td>
-<td v-if="session.role !== 'siswa'" class="text-center" style="white-space: nowrap;">
+<td v-if="session.role === 'admin'" class="text-center" style="white-space: nowrap;">
 <button @click="openModal('edit', row)" class="btn btn-primary btn-action shadow-sm text-white"><i class="fa-solid fa-pen-to-square"></i></button>
 <button @click="deleteData(row[0], view)" class="btn btn-danger btn-action shadow-sm text-white ms-1"><i class="fa-solid fa-trash-can"></i></button>
 </td>
@@ -336,7 +336,7 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 <thead class="table-light">
 <tr>
 <th v-for="h in tableData.header" :key="h" class="text-uppercase text-muted small fw-bold">{{ h }}</th>
-<th v-if="session.role !== 'siswa'" class="text-center" style="width: 100px;">Aksi</th>
+<th v-if="session.role === 'admin'" class="text-center" style="width: 100px;">Aksi</th>
 </tr>
 </thead>
 <tbody>
@@ -346,13 +346,13 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 <span v-else-if="tableData.header[cIdx].toLowerCase().includes('password')" class="text-muted fst-italic">***</span>
 <span v-else>{{ cell }}</span>
 </td>
-<td v-if="session.role !== 'siswa'" class="text-center" style="white-space: nowrap;">
+<td v-if="session.role === 'admin'" class="text-center" style="white-space: nowrap;">
 <button @click="openModal('edit', row)" class="btn btn-primary btn-action shadow-sm text-white" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
 <button @click="deleteData(row[0], view)" class="btn btn-danger btn-action shadow-sm text-white ms-1" title="Hapus"><i class="fa-solid fa-trash-can"></i></button>
 </td>
 </tr>
 <tr v-if="tableData.body.length === 0">
-<td :colspan="tableData.header.length + (session.role !== 'siswa' ? 1 : 0)" class="text-center text-muted p-4"><i class="fa-solid fa-folder-open fs-2 mb-2 d-block"></i>Data tidak tersedia.</td>
+<td :colspan="tableData.header.length + (session.role === 'admin' ? 1 : 0)" class="text-center text-muted p-4"><i class="fa-solid fa-folder-open fs-2 mb-2 d-block"></i>Data tidak tersedia.</td>
 </tr>
 </tbody>
 </table>
@@ -395,8 +395,8 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 <div class="invoice-kop">
 <img src="https://lh3.googleusercontent.com/d/10vRut20sv3Oa6_Bx3TBq5lI1L9rbw-UQ" width="80" style="margin-right: 15px;" onerror="this.style.display='none'">
 <div>
-<h3 class="m-0 fw-bold">SIMA (Sekolah Islam Minhajussalam)</h3>
-<p class="m-0 text-muted small">Jl. Masjid Besar Minhajussalam No. 1 Kauman Srengat Blitar 66152</p>
+<h3 class="m-0 fw-bold">BUKTI PEMBAYARAN</h3>
+<p class="m-0 text-muted small">Sistem Administrasi Terpadu</p>
 </div>
 </div>
 <div class="row mb-4 text-dark fs-6">
@@ -469,7 +469,7 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 
 </div>
 <footer class="text-center py-3 text-muted no-print" style="font-size: 11px;">
-© 2026 <strong>Aplikasi Keuangan SIMAPay Exclusive</strong> | Belajar Inovasi
+© 2026 <strong>Aplikasi Keuangan SIMPAY</strong> | Belajar Inovasi
 </footer>
 </div>
 
@@ -632,7 +632,7 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 
 <div class="row g-3">
   <template v-for="(head, i) in tableData.header" :key="'main-'+i">
-    <div class="col-12" v-if="!['catatan', 'keterangan', 'pembayaran', 'rincian pembayaran'].includes(head.toLowerCase())">
+    <div class="col-12" v-if="!['catatan', 'keterangan'].includes(head.toLowerCase())">
       <label class="form-label fw-bold text-muted small mb-1">{{ head === 'No' && head.includes('Invoice') ? 'No. Invoice' : head }}</label>
 
       <select v-if="head.toLowerCase().includes('jenis') && view === 'pendapatan'" v-model="modal.formData[i]" class="form-select bg-light">
@@ -652,9 +652,9 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
   </template>
 
   <template v-for="(head, i) in tableData.header" :key="'cat-'+i">
-    <div class="col-12" v-if="['catatan', 'keterangan', 'pembayaran', 'rincian pembayaran'].includes(head.toLowerCase())">
-      <label class="form-label fw-bold text-muted small mb-1">Catatan</label>
-      <textarea v-model="modal.formData[i]" class="form-control bg-light" rows="3" placeholder="Input Catatan / Keterangan"></textarea>
+    <div class="col-12" v-if="['catatan', 'keterangan'].includes(head.toLowerCase())">
+      <label class="form-label fw-bold text-muted small mb-1">{{ head }}</label>
+      <textarea v-model="modal.formData[i]" class="form-control bg-light" rows="3" placeholder="Input teks catatan/keterangan"></textarea>
     </div>
   </template>
 </div>
@@ -691,8 +691,6 @@ createApp({
       cetakData: null, cetakRiwayatData: null, listKelas: [],
       
       listJenisPendapatan: [], listKategoriPengeluaran: [],
-
-      // PERBAIKAN: Variabel baru untuk input text pencarian yang bisa diketik
       searchSiswaInput: '', 
 
       modalBuatTagihan: { show: false },
@@ -707,7 +705,6 @@ createApp({
   computed: {
     totalTagihanCart() { return this.formBayar.items.reduce((sum, item) => sum + Number(item.nilai_bayar || 0), 0); },
     
-    // PERBAIKAN: Computed property untuk filter list siswa berdasarkan searchSiswaInput
     filteredListSiswa() {
       if (!this.searchSiswaInput) return this.listSiswa;
       let s = this.searchSiswaInput.toLowerCase();
@@ -779,6 +776,16 @@ createApp({
     toast(title, icon = 'success') { Swal.fire({ toast: true, position: 'top-end', icon: icon, title: title, showConfirmButton: false, timer: 2000 }); },
     toggleHistory(nama) { this.expandedHistory = this.expandedHistory === nama ? null : nama; },
     toggleTagihan(nama) { this.expandedTagihan = this.expandedTagihan === nama ? null : nama; },
+
+    // FUNGSI BARU: Auto Format No Invoice INV/YYYYMMDD/XXXXXX
+    generateInvoice() {
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const randomSuffix = new Date().getTime().toString().slice(-6);
+      return `INV/${yyyy}${mm}${dd}/${randomSuffix}`;
+    },
 
     async fetchDropdowns() {
       try {
@@ -878,7 +885,7 @@ createApp({
     },
 
     bukaModalBayar() {
-      this.formBayar = { invoice: 'INV/' + new Date().getTime().toString().slice(-6), tglBayar: getToday(), siswa: null, items: [] };
+      this.formBayar = { invoice: this.generateInvoice(), tglBayar: getToday(), siswa: null, items: [] };
       this.searchSiswaInput = ''; 
       this.modalBayar.show = true;
     },
@@ -894,7 +901,6 @@ createApp({
     },
     
     pilihSiswa(s) {
-      // PERBAIKAN: Menampilkan nama dan NIS pada form text input setelah siswa dipilih
       this.searchSiswaInput = s.nama + ' (' + s.nis + ')'; 
       if(this.modalSiswa.context === 'bayar') {
         this.formBayar.siswa = s; this.formBayar.items = [];
@@ -983,7 +989,7 @@ createApp({
         this.tableData.header.forEach((head, i) => {
           let h = head.toLowerCase();
           if (h.includes('invoice')) {
-             this.modal.formData[i] = 'INV/' + new Date().getTime().toString().slice(-6);
+             this.modal.formData[i] = this.generateInvoice();
           }
           if (h.includes('tgl') || h.includes('tanggal')) {
              this.modal.formData[i] = getToday();
