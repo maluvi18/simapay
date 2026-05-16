@@ -48,7 +48,7 @@ body { font-family: 'Poppins', sans-serif; background: var(--bg-light); font-siz
 [v-cloak] { display: none; }
 .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:9999; display:flex; flex-direction: column; align-items:center; justify-content:center; }
 .modal-custom { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index: 1060; display:flex; align-items:center; justify-content:center; }
-.modal-body-custom { background:#fff; width: 90%; max-width: 700px; border-radius: 10px; padding: 25px; max-height: 90vh; overflow-y: auto; }
+.modal-body-custom { background:#fff; width: 90%; max-width: 750px; border-radius: 10px; padding: 25px; max-height: 90vh; overflow-y: auto; }
 .modal-body-custom.sm { max-width: 500px; }
 .swal2-container { z-index: 99999 !important; }
 
@@ -91,7 +91,7 @@ html, body { height: auto !important; overflow: visible !important; background: 
 <div v-if="!isLoggedIn" class="d-flex align-items-center justify-content-center" style="height: 100vh;">
 <div class="card card-custom p-4 shadow-lg" style="width: 350px;">
 <div class="text-center mb-4">
-<img src="https://lh3.googleusercontent.com/d/10vRut20sv3Oa6_Bx3TBq5lI1L9rbw-UQ" width="80" style="border-radius: 50%; margin-bottom: 10px;" onerror="this.src='https://via.placeholder.com/80/3498db/ffffff?text=BI'">
+<img src="https://lh3.googleusercontent.com/d/18e1v76BALeQYgi3J4cvN5KE94tdBcR4W" width="80" style="border-radius: 50%; margin-bottom: 10px;" onerror="this.src='https://via.placeholder.com/80/3498db/ffffff?text=BI'">
 <h5 class="mt-3 fw-bold text-primary">Login Sistem</h5>
 </div>
 <div class="mb-3">
@@ -328,8 +328,8 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 <div class="card-custom p-4">
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
 <h5 class="fw-bold text-capitalize m-0 mb-3 mb-md-0">
-  <i v-if="view==='tabungan'" class="fa-solid fa-piggy-bank text-primary me-2"></i>
-  <i v-else class="fa-solid fa-table text-primary me-2"></i> Data {{ view.replace('_', ' ') }}
+<i v-if="view==='tabungan'" class="fa-solid fa-piggy-bank text-primary me-2"></i>
+<i v-else class="fa-solid fa-table text-primary me-2"></i> Data {{ view.replace('_', ' ') }}
 </h5>
 <div class="d-flex gap-2">
 <button v-if="session.role !== 'siswa'" @click="openModal('add')" class="btn btn-primary btn-sm shadow-sm"><i class="fa-solid fa-circle-plus me-1"></i> Tambah Data</button>
@@ -422,7 +422,7 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 <thead class="table-light"><tr><th style="width:70%">Rincian Pembayaran</th><th class="text-end">Jumlah Bayar</th></tr></thead>
 <tbody>
 <tr>
-<td style="white-space: pre-wrap;">{{ cetakData[4] }}</td>
+<td style="white-space: pre-wrap;">{{ cetakData[4] }}<br><small>{{ cetakData[7] }}</small></td>
 <td class="text-end align-middle fw-bold">{{ formatRp(cetakData[5]) }}</td>
 </tr>
 </tbody>
@@ -547,21 +547,6 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 </div>
 
 <div class="mb-3 row align-items-center">
-<label class="col-sm-3 col-form-label fw-bold">Metode Bayar</label>
-<div class="col-sm-9">
-<select class="form-select" v-model="formBayar.metode" :disabled="!formBayar.siswa">
-  <option value="Tunai">Tunai</option>
-  <option value="Transfer">Transfer Bank</option>
-  <option value="QRIS">QRIS / e-Wallet</option>
-  <option value="Potong Tabungan">Potong Tabungan Siswa</option>
-</select>
-<div v-if="formBayar.siswa" class="mt-2 p-2 rounded border" :class="formBayar.saldoSiswa >= totalTagihanCart ? 'bg-success bg-opacity-10 border-success text-success' : 'bg-danger bg-opacity-10 border-danger text-danger'">
-  <i class="fa-solid fa-piggy-bank me-1"></i> Saldo Tabungan: <strong>{{ formatRp(formBayar.saldoSiswa) }}</strong>
-</div>
-</div>
-</div>
-
-<div class="mb-3 row align-items-center">
 <label class="col-sm-3 col-form-label fw-bold">Rincian Tagihan</label>
 <div class="col-sm-9">
 <button @click="bukaModalJenisTagihan" class="btn btn-success btn-sm shadow-sm" :disabled="!formBayar.siswa">
@@ -569,8 +554,9 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 </button>
 </div>
 </div>
+
 <div class="table-responsive mt-3" v-if="formBayar.items.length > 0">
-<table class="table table-bordered table-bayar">
+<table class="table table-bordered table-bayar mb-0">
 <thead><tr><th>Nama Pembayaran</th><th>Tagihan & Sisa</th><th>Nominal Bayar</th><th>Aksi</th></tr></thead>
 <tbody>
 <tr v-for="(item, idx) in formBayar.items" :key="idx">
@@ -583,13 +569,74 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 </td>
 <td class="text-center"><button @click="formBayar.items.splice(idx, 1)" class="btn btn-outline-danger btn-sm py-0 px-2"><i class="fa-solid fa-trash-can"></i></button></td>
 </tr>
-<tr class="fw-bold">
-<td colspan="2" class="text-end align-middle">TOTAL DIBAYAR:</td>
-<td class="text-end fs-6 text-success bg-success bg-opacity-10 border-success">{{ formatRp(totalTagihanCart) }}</td>
-<td></td>
-</tr>
 </tbody>
 </table>
+
+<div class="row mt-3 pt-3 border-top">
+    <div class="col-md-7">
+        <h6 class="fw-bold mb-3"><i class="fa-solid fa-layer-group text-primary me-2"></i>Multi Metode Pembayaran</h6>
+        <div class="row mb-2 align-items-center">
+            <label class="col-4 small fw-bold text-muted">Tunai</label>
+            <div class="col-8">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Rp</span>
+                    <input type="number" class="form-control" v-model.number="formBayar.metodeBayar.tunai">
+                </div>
+            </div>
+        </div>
+        <div class="row mb-2 align-items-center">
+            <label class="col-4 small fw-bold text-muted">Transfer Bank</label>
+            <div class="col-8">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Rp</span>
+                    <input type="number" class="form-control" v-model.number="formBayar.metodeBayar.transfer">
+                </div>
+            </div>
+        </div>
+        <div class="row mb-2 align-items-center">
+            <label class="col-4 small fw-bold text-muted">QRIS/e-Wallet</label>
+            <div class="col-8">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Rp</span>
+                    <input type="number" class="form-control" v-model.number="formBayar.metodeBayar.qris">
+                </div>
+            </div>
+        </div>
+        <div class="row mb-2 align-items-center">
+            <label class="col-4 small fw-bold text-muted">Potong Tabungan</label>
+            <div class="col-8">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Rp</span>
+                    <input type="number" class="form-control" v-model.number="formBayar.metodeBayar.tabungan" :max="formBayar.saldoSiswa">
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-outline-primary btn-sm mt-2 w-100 fw-bold" @click="setFullTunai">
+            <i class="fa-solid fa-money-bill-wave me-1"></i> Isi Otomatis Set Full Tunai
+        </button>
+    </div>
+
+    <div class="col-md-5">
+        <div class="p-2 rounded border mb-3 text-center" :class="formBayar.saldoSiswa >= formBayar.metodeBayar.tabungan ? 'bg-success bg-opacity-10 border-success text-success' : 'bg-danger bg-opacity-10 border-danger text-danger'">
+            <i class="fa-solid fa-piggy-bank me-1 mb-1"></i> Saldo Tabungan Siswa:<br><strong class="fs-6">{{ formatRp(formBayar.saldoSiswa) }}</strong>
+        </div>
+        <div class="p-3 rounded border bg-light shadow-sm">
+            <div class="d-flex justify-content-between mb-1">
+                <span class="small text-muted">Total Tagihan (Cart):</span>
+                <span class="fw-bold">{{ formatRp(totalTagihanCart) }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-1">
+                <span class="small text-muted">Total Bayar (Metode):</span>
+                <span class="fw-bold">{{ formatRp(totalMultiBayar) }}</span>
+            </div>
+            <hr class="my-2 border-secondary">
+            <div class="d-flex justify-content-between">
+                <span class="small fw-bold">Selisih Kekurangan:</span>
+                <span class="fw-bold" :class="totalTagihanCart === totalMultiBayar ? 'text-success' : 'text-danger'">{{ formatRp(totalTagihanCart - totalMultiBayar) }}</span>
+            </div>
+        </div>
+    </div>
+</div>
 </div>
 <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
 <button @click="modalBayar.show = false" class="btn btn-light shadow-sm"><i class="fa-solid fa-xmark me-1"></i> Batal</button>
@@ -650,43 +697,36 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 <h5 class="fw-bold text-capitalize m-0 text-primary"><i :class="modal.action === 'add' ? 'fa-solid fa-circle-plus' : 'fa-solid fa-pen-to-square'"></i> {{ modal.action === 'add' ? 'Tambah' : 'Edit' }} Data</h5>
 <i class="fa-solid fa-xmark fs-4 text-secondary cursor-pointer" @click="modal.show = false"></i>
 </div>
-
 <div class="row g-3">
-  <template v-for="(head, i) in tableData.header" :key="'main-'+i">
-    <div class="col-12" v-if="!['catatan', 'keterangan'].includes(head.toLowerCase())">
-      <label class="form-label fw-bold text-muted small mb-1">{{ head === 'No' && head.includes('Invoice') ? 'No. Invoice' : head }}</label>
+<template v-for="(head, i) in tableData.header" :key="'main-'+i">
+<div class="col-12" v-if="!['catatan', 'keterangan'].includes(head.toLowerCase())">
+<label class="form-label fw-bold text-muted small mb-1">{{ head === 'No' && head.includes('Invoice') ? 'No. Invoice' : head }}</label>
+<select v-if="head.toLowerCase().includes('jenis') && view === 'pendapatan'" v-model="modal.formData[i]" class="form-select bg-light">
+<option value="" disabled>Pilih {{ head }}...</option>
+<option v-for="j in listJenisPendapatan" :value="j">{{ j }}</option>
+</select>
+<select v-else-if="head.toLowerCase().includes('nama') && view === 'tabungan'" v-model="modal.formData[i]" class="form-select bg-light">
+<option value="" disabled>Pilih {{ head }}...</option>
+<option v-for="s in listSiswa" :value="s.nama">{{ s.nama }} ({{ s.nis }})</option>
+</select>
 
-      <select v-if="head.toLowerCase().includes('jenis') && view === 'pendapatan'" v-model="modal.formData[i]" class="form-select bg-light">
-          <option value="" disabled>Pilih {{ head }}...</option>
-          <option v-for="j in listJenisPendapatan" :value="j">{{ j }}</option>
-      </select>
+<select v-else-if="(head.toLowerCase().includes('kategori') || head.toLowerCase().includes('jenis')) && view === 'pengeluaran'" v-model="modal.formData[i]" class="form-select bg-light">
+<option value="" disabled>Pilih {{ head }}...</option>
+<option v-for="k in listKategoriPengeluaran" :value="k">{{ k }}</option>
+</select>
+<input v-else-if="head.toLowerCase().includes('tgl') || head.toLowerCase().includes('tanggal')" type="date" v-model="modal.formData[i]" class="form-control bg-light">
+<input v-else v-model="modal.formData[i]" :type="head.toLowerCase().includes('password') ? 'password' : (head.toLowerCase().includes('nominal') ? 'number' : 'text')" class="form-control bg-light" :readonly="(i === 0 && modal.action === 'add') || (head.toLowerCase().includes('invoice') && modal.action === 'add')" :placeholder="(i === 0 && modal.action === 'add') || (head.toLowerCase().includes('invoice') && modal.action === 'add') ? 'Auto Generate' : 'Input ' + head">
 
-      <select v-else-if="head.toLowerCase().includes('nama') && view === 'tabungan'" v-model="modal.formData[i]" class="form-select bg-light">
-          <option value="" disabled>Pilih {{ head }}...</option>
-          <option v-for="s in listSiswa" :value="s.nama">{{ s.nama }} ({{ s.nis }})</option>
-      </select>
-      
-      <select v-else-if="(head.toLowerCase().includes('kategori') || head.toLowerCase().includes('jenis')) && view === 'pengeluaran'" v-model="modal.formData[i]" class="form-select bg-light">
-          <option value="" disabled>Pilih {{ head }}...</option>
-          <option v-for="k in listKategoriPengeluaran" :value="k">{{ k }}</option>
-      </select>
-
-      <input v-else-if="head.toLowerCase().includes('tgl') || head.toLowerCase().includes('tanggal')" type="date" v-model="modal.formData[i]" class="form-control bg-light">
-
-      <input v-else v-model="modal.formData[i]" :type="head.toLowerCase().includes('password') ? 'password' : (head.toLowerCase().includes('nominal') ? 'number' : 'text')" class="form-control bg-light" :readonly="(i === 0 && modal.action === 'add') || (head.toLowerCase().includes('invoice') && modal.action === 'add')" :placeholder="(i === 0 && modal.action === 'add') || (head.toLowerCase().includes('invoice') && modal.action === 'add') ? 'Auto Generate' : 'Input ' + head">
-      
-      <small v-if="head.toLowerCase().includes('nominal') && view === 'tabungan'" class="text-muted mt-1 d-block"><i class="fa-solid fa-circle-info"></i> Isi dengan angka minus (-) untuk Penarikan / Pengambilan.</small>
-    </div>
-  </template>
-
-  <template v-for="(head, i) in tableData.header" :key="'cat-'+i">
-    <div class="col-12" v-if="['catatan', 'keterangan'].includes(head.toLowerCase())">
-      <label class="form-label fw-bold text-muted small mb-1">{{ head }}</label>
-      <textarea v-model="modal.formData[i]" class="form-control bg-light" rows="3" placeholder="Input teks catatan/keterangan"></textarea>
-    </div>
-  </template>
+<small v-if="head.toLowerCase().includes('nominal') && view === 'tabungan'" class="text-muted mt-1 d-block"><i class="fa-solid fa-circle-info"></i> Isi dengan angka minus (-) untuk Penarikan / Pengambilan.</small>
 </div>
-
+</template>
+<template v-for="(head, i) in tableData.header" :key="'cat-'+i">
+<div class="col-12" v-if="['catatan', 'keterangan'].includes(head.toLowerCase())">
+<label class="form-label fw-bold text-muted small mb-1">{{ head }}</label>
+<textarea v-model="modal.formData[i]" class="form-control bg-light" rows="3" placeholder="Input teks catatan/keterangan"></textarea>
+</div>
+</template>
+</div>
 <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
 <button @click="modal.show = false" class="btn btn-light shadow-sm"><i class="fa-solid fa-xmark me-1"></i> Batal</button>
 <button @click="saveData" class="btn btn-primary shadow-sm px-4"><i class="fa-solid fa-floppy-disk me-1"></i> Simpan Data</button>
@@ -694,409 +734,416 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 </div>
 </div>
 </div>
-
 <script>
 // =================================================================================
 // MASUKKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI BAWAH INI (Hasil Deploy)
 // =================================================================================
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwI3bKZVuzBKYIYSRZ_L62fu3cAFDZVoazTst1Vi01xxWLV2igz0D5aXbz-kUPs1-1E/exec';
-
 let myChart = null;
 const getToday = () => { const d = new Date(); return d.toISOString().split('T')[0]; };
 const { createApp } = Vue;
-
 createApp({
-  data() {
-    return {
-      loading: false, isLoggedIn: false, view: 'dashboard', sidebarOpen: false, showPass: false, printMode: '',
-      form: { user: '', pass: '' },
-      session: {}, tableData: { header: [], body: [] },
-      stats: { summary: { saldo:0, pendapatan:0, pengeluaran:0, labaRugi:0, tagihan:0, kurang:0 }, recentPendapatan: [], chartPendapatan: {labels:[], data:[]} },
-      modal: { show: false, action: 'add', identifier: null, formData: [] },
+data() {
+return {
+loading: false, isLoggedIn: false, view: 'dashboard', sidebarOpen: false, showPass: false, printMode: '',
+form: { user: '', pass: '' },
+session: {}, tableData: { header: [], body: [] },
+stats: { summary: { saldo:0, pendapatan:0, pengeluaran:0, labaRugi:0, tagihan:0, kurang:0 }, recentPendapatan: [], chartPendapatan: {labels:[], data:[]} },
+modal: { show: false, action: 'add', identifier: null, formData: [] },
+historyPembayaranSiswa: [], searchHistory: '', expandedHistory: null,
+searchTagihan: '', expandedTagihan: null,
+cetakData: null, cetakRiwayatData: null, listKelas: [],
 
-      historyPembayaranSiswa: [], searchHistory: '', expandedHistory: null,
-      searchTagihan: '', expandedTagihan: null,
-      cetakData: null, cetakRiwayatData: null, listKelas: [],
-      
-      listJenisPendapatan: [], listKategoriPengeluaran: [],
-      searchSiswaInput: '', 
+listJenisPendapatan: [], listKategoriPengeluaran: [],
+searchSiswaInput: '',
+modalBuatTagihan: { show: false },
+formBuatTagihan: { tipe: 'semua', kelasTarget: '', siswa: null, jenis: '', nominal: '' },
+modalBayar: { show: false },
+modalSiswa: { show: false, context: 'bayar' },
+modalTagihan: { show: false },
+listSiswa: [], listTagihanAktif: [],
+formBayar: { 
+    invoice: '', tglBayar: getToday(), siswa: null, items: [], 
+    metodeBayar: { tunai: 0, transfer: 0, qris: 0, tabungan: 0 }, 
+    saldoSiswa: 0 
+}
+}
+},
+computed: {
+totalTagihanCart() { return this.formBayar.items.reduce((sum, item) => sum + Number(item.nilai_bayar || 0), 0); },
+totalMultiBayar() { 
+    return Number(this.formBayar.metodeBayar.tunai || 0) + 
+           Number(this.formBayar.metodeBayar.transfer || 0) + 
+           Number(this.formBayar.metodeBayar.qris || 0) + 
+           Number(this.formBayar.metodeBayar.tabungan || 0); 
+},
 
-      modalBuatTagihan: { show: false },
-      formBuatTagihan: { tipe: 'semua', kelasTarget: '', siswa: null, jenis: '', nominal: '' },
-      modalBayar: { show: false },
-      modalSiswa: { show: false, context: 'bayar' },
-      modalTagihan: { show: false },
-      listSiswa: [], listTagihanAktif: [],
-      formBayar: { invoice: '', tglBayar: getToday(), siswa: null, items: [], metode: 'Tunai', saldoSiswa: 0 }
-    }
-  },
-  computed: {
-    totalTagihanCart() { return this.formBayar.items.reduce((sum, item) => sum + Number(item.nilai_bayar || 0), 0); },
-    
-    filteredListSiswa() {
-      if (!this.searchSiswaInput) return this.listSiswa;
-      let s = this.searchSiswaInput.toLowerCase();
-      return this.listSiswa.filter(x => x.nama.toLowerCase().includes(s) || x.nis.toString().toLowerCase().includes(s));
-    },
+filteredListSiswa() {
+if (!this.searchSiswaInput) return this.listSiswa;
+let s = this.searchSiswaInput.toLowerCase();
+return this.listSiswa.filter(x => x.nama.toLowerCase().includes(s) || x.nis.toString().toLowerCase().includes(s));
+},
+filteredGroupedHistory() {
+let groups = {};
+this.historyPembayaranSiswa.forEach(row => {
+let nama = row[1];
+if(!groups[nama]) groups[nama] = { nama: nama, totalBayar: 0, details: [] };
+groups[nama].details.push(row);
+groups[nama].totalBayar += Number(row[5] || 0);
+});
+let arr = Object.values(groups);
+if(this.searchHistory) {
+let s = this.searchHistory.toLowerCase();
+arr = arr.filter(g => g.nama.toLowerCase().includes(s));
+}
+return arr;
+},
+filteredGroupedTagihan() {
+if(this.view !== 'tagihan_siswa') return [];
+let groups = {};
+this.tableData.body.forEach(row => {
+let nama = row[2];
+if(!groups[nama]) groups[nama] = { nama: nama, totalTagihan: 0, totalKurang: 0, details: [] };
+groups[nama].details.push(row);
+groups[nama].totalTagihan += Number(row[4] || 0);
+groups[nama].totalKurang += Number(row[6] || 0);
+});
+let arr = Object.values(groups);
+if(this.searchTagihan) {
+let s = this.searchTagihan.toLowerCase();
+arr = arr.filter(g => g.nama.toLowerCase().includes(s));
+}
+return arr;
+}
+},
+created() {
+const localSess = localStorage.getItem('erp_session');
+if (localSess) {
+this.session = JSON.parse(localSess);
+this.isLoggedIn = true;
+this.fetchDropdowns();
+this.go(this.session.lastView || 'dashboard');
+}
+},
+mounted() {
+if(window.innerWidth >= 768) { this.sidebarOpen = true; }
+window.addEventListener('afterprint', () => { this.printMode = ''; });
+},
+methods: {
+async apiCall(action, payload = {}) {
+if (SCRIPT_URL === 'URL_APPS_SCRIPT_ANDA_DISINI') {
+Swal.fire('Konfigurasi Dibutuhkan', 'Ganti variabel SCRIPT_URL dengan Web App URL Google Apps Script', 'error');
+throw new Error("Missing Web App URL");
+}
+try {
+const response = await fetch(SCRIPT_URL, {
+method: 'POST',
+headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+body: JSON.stringify({ action: action, ...payload })
+});
+return await response.json();
+} catch (err) { throw new Error("Koneksi API gagal."); }
+},
+formatRp(angka) { if(!angka || isNaN(angka)) return "0";
+const val = Number(angka);
+if(val < 0) return "- Rp " + Math.abs(val).toLocaleString('id-ID');
+return "Rp " + val.toLocaleString('id-ID');
+},
+toast(title, icon = 'success') { Swal.fire({ toast: true, position: 'top-end', icon: icon, title: title, showConfirmButton: false, timer: 2000 }); },
+toggleHistory(nama) { this.expandedHistory = this.expandedHistory === nama ? null : nama; },
+toggleTagihan(nama) { this.expandedTagihan = this.expandedTagihan === nama ? null : nama; },
+generateInvoice() {
+const d = new Date();
+const yyyy = d.getFullYear();
+const mm = String(d.getMonth() + 1).padStart(2, '0');
+const dd = String(d.getDate()).padStart(2, '0');
+const randomSuffix = new Date().getTime().toString().slice(-6);
+return `INV/${yyyy}${mm}${dd}/${randomSuffix}`;
+},
+async fetchDropdowns() {
+try {
+const res = await this.apiCall('getDropdownData');
+if(res.success) {
+this.listJenisPendapatan = res.jenisPendapatan;
+this.listKategoriPengeluaran = res.kategoriPengeluaran;
+}
+} catch(e) {}
+},
+async doLogin() {
+if(!this.form.user || !this.form.pass) return;
+this.loading = true;
+try {
+const res = await this.apiCall('login', { user: this.form.user, pass: this.form.pass });
+this.loading = false;
+if(res.success) {
+this.isLoggedIn = true; this.session = res;
+localStorage.setItem('erp_session', JSON.stringify(res));
+this.fetchDropdowns();
+this.go('dashboard');
+} else Swal.fire('Gagal Login', res.message, 'error');
+} catch (err) { this.loading = false; Swal.fire('Error API', err.message, 'error'); }
+},
+logout() { localStorage.removeItem('erp_session'); this.isLoggedIn = false; this.session = {}; this.form = { user: '', pass: '' }; },
 
-    filteredGroupedHistory() {
-      let groups = {};
-      this.historyPembayaranSiswa.forEach(row => {
-        let nama = row[1];
-        if(!groups[nama]) groups[nama] = { nama: nama, totalBayar: 0, details: [] };
-        groups[nama].details.push(row);
-        groups[nama].totalBayar += Number(row[5] || 0);
-      });
-      let arr = Object.values(groups);
-      if(this.searchHistory) {
-        let s = this.searchHistory.toLowerCase();
-        arr = arr.filter(g => g.nama.toLowerCase().includes(s));
-      }
-      return arr;
-    },
-    filteredGroupedTagihan() {
-      if(this.view !== 'tagihan_siswa') return [];
-      let groups = {};
-      this.tableData.body.forEach(row => {
-        let nama = row[2];
-        if(!groups[nama]) groups[nama] = { nama: nama, totalTagihan: 0, totalKurang: 0, details: [] };
-        groups[nama].details.push(row);
-        groups[nama].totalTagihan += Number(row[4] || 0);
-        groups[nama].totalKurang += Number(row[6] || 0);
-      });
-      let arr = Object.values(groups);
-      if(this.searchTagihan) {
-        let s = this.searchTagihan.toLowerCase();
-        arr = arr.filter(g => g.nama.toLowerCase().includes(s));
-      }
-      return arr;
-    }
-  },
-  created() {
-    const localSess = localStorage.getItem('erp_session');
-    if (localSess) {
-      this.session = JSON.parse(localSess);
-      this.isLoggedIn = true;
-      this.fetchDropdowns();
-      this.go(this.session.lastView || 'dashboard');
-    }
-  },
-  mounted() {
-    if(window.innerWidth >= 768) { this.sidebarOpen = true; }
-    window.addEventListener('afterprint', () => { this.printMode = ''; });
-  },
-  methods: {
-    async apiCall(action, payload = {}) {
-      if (SCRIPT_URL === 'URL_APPS_SCRIPT_ANDA_DISINI') {
-        Swal.fire('Konfigurasi Dibutuhkan', 'Ganti variabel SCRIPT_URL dengan Web App URL Google Apps Script', 'error');
-        throw new Error("Missing Web App URL");
-      }
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: action, ...payload })
-        });
-        return await response.json();
-      } catch (err) { throw new Error("Koneksi API gagal."); }
-    },
-    formatRp(angka) { if(!angka || isNaN(angka)) return "0"; 
-       const val = Number(angka);
-       if(val < 0) return "- Rp " + Math.abs(val).toLocaleString('id-ID');
-       return "Rp " + val.toLocaleString('id-ID'); 
-    },
-    toast(title, icon = 'success') { Swal.fire({ toast: true, position: 'top-end', icon: icon, title: title, showConfirmButton: false, timer: 2000 }); },
-    toggleHistory(nama) { this.expandedHistory = this.expandedHistory === nama ? null : nama; },
-    toggleTagihan(nama) { this.expandedTagihan = this.expandedTagihan === nama ? null : nama; },
+go(menu) {
+this.view = menu;
+this.session.lastView = menu;
+localStorage.setItem('erp_session', JSON.stringify(this.session));
+if(window.innerWidth < 768) this.sidebarOpen = false;
+if(menu === 'dashboard') this.loadDashboard();
+else if (menu === 'pembayaran_siswa') this.fetchHistorySiswa();
+else if(['users', 'siswa', 'tagihan_siswa', 'pendapatan', 'pengeluaran', 'utang_pegawai', 'jenis_pendapatan', 'kategori_pengeluaran', 'tabungan'].includes(menu)) {
+this.fetchTableData();
+}
+},
+async fetchHistorySiswa() {
+this.loading = true;
+this.expandedHistory = null;
+try {
+const res = await this.apiCall('getModuleData', { moduleName: 'pendapatan', role: this.session.role, namaUser: this.session.nama });
+this.loading = false;
+if(res.success) {
+this.tableData = { header: res.header, body: res.body };
+this.historyPembayaranSiswa = res.body.filter(r => r[2] === 'Siswa');
+}
+} catch(err) { this.loading = false; }
+},
+doPrintInvoice(row) {
+this.cetakData = row;
+this.printMode = 'invoice';
+this.$nextTick(() => { window.print(); });
+},
+doPrintRiwayat(group) {
+this.cetakRiwayatData = group;
+this.printMode = 'riwayat';
+this.$nextTick(() => { window.print(); });
+},
+printReport(type) {
+this.printMode = type;
+this.$nextTick(() => { window.print(); });
+},
+async fetchDaftarKelas() {
+try {
+const res = await this.apiCall('getDaftarKelas');
+this.listKelas = res;
+} catch(e) {}
+},
 
-    generateInvoice() {
-      const d = new Date();
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
-      const randomSuffix = new Date().getTime().toString().slice(-6);
-      return `INV/${yyyy}${mm}${dd}/${randomSuffix}`;
-    },
+bukaModalBuatTagihan() {
+this.formBuatTagihan = { tipe: 'semua', kelasTarget: '', siswa: null, jenis: '', nominal: '' };
+this.searchSiswaInput = '';
+this.modalBuatTagihan.show = true;
+},
+async submitBuatTagihan() {
+if(!this.formBuatTagihan.jenis || !this.formBuatTagihan.nominal) return Swal.fire('Peringatan', 'Lengkapi Jenis dan Nominal Tagihan', 'warning');
+if(this.formBuatTagihan.tipe === 'individu' && !this.formBuatTagihan.siswa) return Swal.fire('Peringatan', 'Pilih Siswa terlebih dahulu', 'warning');
+if(this.formBuatTagihan.tipe === 'kelas' && !this.formBuatTagihan.kelasTarget) return Swal.fire('Peringatan', 'Pilih Jenjang Kelas', 'warning');
+this.loading = true;
+try {
+const res = await this.apiCall('generateTagihan', { payload: this.formBuatTagihan });
+this.loading = false;
+if(res.success) {
+this.toast(res.message);
+this.modalBuatTagihan.show = false;
+this.formBuatTagihan = { tipe: 'semua', kelasTarget:'', siswa: null, jenis: '', nominal: '' };
+this.searchSiswaInput = '';
+if(this.view === 'tagihan_siswa') this.fetchTableData();
+} else Swal.fire('Gagal', res.message, 'error');
+} catch(err) { this.loading = false; Swal.fire('Error', err.message, 'error'); }
+},
+bukaModalBayar() {
+this.formBayar = { 
+    invoice: this.generateInvoice(), tglBayar: getToday(), siswa: null, items: [], 
+    metodeBayar: { tunai: 0, transfer: 0, qris: 0, tabungan: 0 }, 
+    saldoSiswa: 0 
+};
+this.searchSiswaInput = '';
+this.modalBayar.show = true;
+},
 
-    async fetchDropdowns() {
-      try {
-        const res = await this.apiCall('getDropdownData');
-        if(res.success) {
-          this.listJenisPendapatan = res.jenisPendapatan;
-          this.listKategoriPengeluaran = res.kategoriPengeluaran;
-        }
-      } catch(e) {}
-    },
+async fetchSaldoSiswa(namaSiswa) {
+try {
+const res = await this.apiCall('getSaldoTabungan', { namaSiswa: namaSiswa });
+if(res.success) {
+this.formBayar.saldoSiswa = res.saldo;
+}
+} catch(e) {}
+},
+async bukaModalPilihSiswa(context) {
+this.modalSiswa.context = context;
+this.loading = true;
+try {
+const res = await this.apiCall('getDaftarSiswa');
+this.loading = false; this.listSiswa = res; this.modalSiswa.show = true;
+if(context === 'tagihan' && this.listKelas.length === 0) this.fetchDaftarKelas();
+} catch(err) { this.loading = false; }
+},
 
-    async doLogin() {
-      if(!this.form.user || !this.form.pass) return;
-      this.loading = true;
-      try {
-        const res = await this.apiCall('login', { user: this.form.user, pass: this.form.pass });
-        this.loading = false;
-        if(res.success) {
-          this.isLoggedIn = true; this.session = res;
-          localStorage.setItem('erp_session', JSON.stringify(res));
-          this.fetchDropdowns();
-          this.go('dashboard');
-        } else Swal.fire('Gagal Login', res.message, 'error');
-      } catch (err) { this.loading = false; Swal.fire('Error API', err.message, 'error'); }
-    },
-    logout() { localStorage.removeItem('erp_session'); this.isLoggedIn = false; this.session = {}; this.form = { user: '', pass: '' }; },
-    
-    go(menu) {
-      this.view = menu;
-      this.session.lastView = menu;
-      localStorage.setItem('erp_session', JSON.stringify(this.session));
-      if(window.innerWidth < 768) this.sidebarOpen = false;
+pilihSiswa(s) {
+this.searchSiswaInput = s.nama + ' (' + s.nis + ')';
+if(this.modalSiswa.context === 'bayar') {
+this.formBayar.siswa = s;
+this.formBayar.items = [];
+this.formBayar.metodeBayar = { tunai: 0, transfer: 0, qris: 0, tabungan: 0 };
+this.formBayar.saldoSiswa = 0;
+this.fetchSaldoSiswa(s.nama);
+} else {
+this.formBuatTagihan.siswa = s;
+}
+this.modalSiswa.show = false;
+},
+async bukaModalJenisTagihan() {
+if(!this.formBayar.siswa) return;
+this.loading = true;
+try {
+const res = await this.apiCall('getTagihanSiswa', { nis: this.formBayar.siswa.nis });
+this.loading = false; this.listTagihanAktif = res; this.modalTagihan.show = true;
+} catch(err) { this.loading = false; }
+},
+setFullTunai() {
+   this.formBayar.metodeBayar.tunai = this.totalTagihanCart;
+   this.formBayar.metodeBayar.transfer = 0;
+   this.formBayar.metodeBayar.qris = 0;
+   this.formBayar.metodeBayar.tabungan = 0;
+},
+tambahkanTagihanKeCart(tagihan) {
+const exists = this.formBayar.items.find(i => i.id === tagihan.id);
+if(exists) return this.toast('Tagihan sudah masuk!', 'warning');
+this.formBayar.items.push({ ...tagihan, nilai_bayar: tagihan.sisa });
+this.setFullTunai();
+this.modalTagihan.show = false;
+},
+async submitPembayaranSiswa() {
+// Validasi Nominal Multi Bayar
+if(this.totalTagihanCart !== this.totalMultiBayar) {
+    return Swal.fire('Nominal Tidak Sesuai', 'Total Bayar (Multi Metode) harus sama dengan Total Tagihan Keranjang (' + this.formatRp(this.totalTagihanCart) + '). Silakan cek kembali.', 'warning');
+}
 
-      if(menu === 'dashboard') this.loadDashboard();
-      else if (menu === 'pembayaran_siswa') this.fetchHistorySiswa();
-      else if(['users', 'siswa', 'tagihan_siswa', 'pendapatan', 'pengeluaran', 'utang_pegawai', 'jenis_pendapatan', 'kategori_pengeluaran', 'tabungan'].includes(menu)) {
-        this.fetchTableData();
-      }
-    },
+// Validasi Saldo jika potong tabungan
+if(this.formBayar.metodeBayar.tabungan > 0 && this.formBayar.metodeBayar.tabungan > this.formBayar.saldoSiswa) {
+return Swal.fire('Saldo Tidak Mencukupi', 'Nominal potongan tabungan (' + this.formatRp(this.formBayar.metodeBayar.tabungan) + ') melebihi sisa saldo tabungan siswa.', 'error');
+}
 
-    async fetchHistorySiswa() {
-      this.loading = true;
-      this.expandedHistory = null;
-      try {
-        const res = await this.apiCall('getModuleData', { moduleName: 'pendapatan', role: this.session.role, namaUser: this.session.nama });
-        this.loading = false;
-        if(res.success) {
-          this.tableData = { header: res.header, body: res.body };
-          this.historyPembayaranSiswa = res.body.filter(r => r[2] === 'Siswa');
-        }
-      } catch(err) { this.loading = false; }
-    },
-    doPrintInvoice(row) {
-      this.cetakData = row;
-      this.printMode = 'invoice';
-      this.$nextTick(() => { window.print(); });
-    },
-    doPrintRiwayat(group) {
-      this.cetakRiwayatData = group;
-      this.printMode = 'riwayat';
-      this.$nextTick(() => { window.print(); });
-    },
-    printReport(type) {
-      this.printMode = type;
-      this.$nextTick(() => { window.print(); });
-    },
-    async fetchDaftarKelas() {
-      try {
-        const res = await this.apiCall('getDaftarKelas');
-        this.listKelas = res;
-      } catch(e) {}
-    },
-    
-    bukaModalBuatTagihan() {
-      this.formBuatTagihan = { tipe: 'semua', kelasTarget: '', siswa: null, jenis: '', nominal: '' };
-      this.searchSiswaInput = '';
-      this.modalBuatTagihan.show = true;
-    },
+this.loading = true;
+const payload = {
+siswa: this.formBayar.siswa,
+invoice: this.formBayar.invoice,
+tglBayar: this.formBayar.tglBayar,
+metodeBayar: this.formBayar.metodeBayar,
+items: this.formBayar.items,
+total: this.totalTagihanCart
+};
+try {
+const res = await this.apiCall('prosesPembayaranSiswa', { payload: payload });
+this.loading = false;
+if(res.success) { this.toast(res.message); this.modalBayar.show = false; this.fetchHistorySiswa(); }
+else Swal.fire('Gagal', res.message, 'error');
+} catch(err) { this.loading = false; Swal.fire('Error', err.message, 'error'); }
+},
 
-    async submitBuatTagihan() {
-      if(!this.formBuatTagihan.jenis || !this.formBuatTagihan.nominal) return Swal.fire('Peringatan', 'Lengkapi Jenis dan Nominal Tagihan', 'warning');
-      if(this.formBuatTagihan.tipe === 'individu' && !this.formBuatTagihan.siswa) return Swal.fire('Peringatan', 'Pilih Siswa terlebih dahulu', 'warning');
-      if(this.formBuatTagihan.tipe === 'kelas' && !this.formBuatTagihan.kelasTarget) return Swal.fire('Peringatan', 'Pilih Jenjang Kelas', 'warning');
+async fetchTableData() {
+this.loading = true;
+this.expandedTagihan = null;
+try {
+const res = await this.apiCall('getModuleData', { moduleName: this.view, role: this.session.role, namaUser: this.session.nama });
+this.loading = false;
+if(res.success) {
+this.tableData = { header: res.header, body: res.body };
+if(this.view === 'tagihan_siswa' && this.listKelas.length === 0) this.fetchDaftarKelas();
 
-      this.loading = true;
-      try {
-        const res = await this.apiCall('generateTagihan', { payload: this.formBuatTagihan });
-        this.loading = false;
-        if(res.success) {
-          this.toast(res.message);
-          this.modalBuatTagihan.show = false;
-          this.formBuatTagihan = { tipe: 'semua', kelasTarget:'', siswa: null, jenis: '', nominal: '' };
-          this.searchSiswaInput = '';
-          if(this.view === 'tagihan_siswa') this.fetchTableData();
-        } else Swal.fire('Gagal', res.message, 'error');
-      } catch(err) { this.loading = false; Swal.fire('Error', err.message, 'error'); }
-    },
+if(this.view === 'tabungan' && this.listSiswa.length === 0) {
+const resSiswa = await this.apiCall('getDaftarSiswa');
+this.listSiswa = resSiswa;
+}
+} else this.tableData = { header: [], body: [] };
+} catch(err) { this.loading = false; this.tableData = { header: [], body: [] }; }
+},
+async loadDashboard() {
+this.loading = true;
+try {
+const res = await this.apiCall('getDashboardStats', { role: this.session.role, namaUser: this.session.nama });
+this.loading = false;
+if(res.success) {
+this.stats = res;
+this.$nextTick(() => { if(this.view === 'dashboard') this.renderChart(); });
+}
+} catch(err) { this.loading = false; }
+},
+renderChart() {
+if (myChart) myChart.destroy();
+const ctx = document.getElementById('chartIncome');
+if(ctx && this.stats.chartPendapatan.labels.length > 0) {
+let chartColors = ['#3498db', '#2ecc71', '#f1c40f', '#e74c3c', '#9b59b6'];
+if(this.session.role === 'siswa') {
+chartColors = ['#e74c3c', '#2ecc71'];
+}
+myChart = new Chart(ctx, {
+type: 'doughnut',
+data: {
+labels: this.stats.chartPendapatan.labels,
+datasets: [{ data: this.stats.chartPendapatan.data, backgroundColor: chartColors }]
+},
+options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: {size: 10} } } } }
+});
+}
+},
+openModal(action, row = null) {
+this.modal.action = action;
+if(action === 'edit' && row) {
+this.modal.identifier = row[0];
+this.modal.formData = [...row];
+} else {
+this.modal.identifier = null;
+this.modal.formData = new Array(this.tableData.header.length).fill('');
 
-    bukaModalBayar() {
-      this.formBayar = { invoice: this.generateInvoice(), tglBayar: getToday(), siswa: null, items: [], metode: 'Tunai', saldoSiswa: 0 };
-      this.searchSiswaInput = ''; 
-      this.modalBayar.show = true;
-    },
-    
-    async fetchSaldoSiswa(namaSiswa) {
-      try {
-        const res = await this.apiCall('getSaldoTabungan', { namaSiswa: namaSiswa });
-        if(res.success) {
-          this.formBayar.saldoSiswa = res.saldo;
-        }
-      } catch(e) {}
-    },
-
-    async bukaModalPilihSiswa(context) {
-      this.modalSiswa.context = context;
-      this.loading = true;
-      try {
-        const res = await this.apiCall('getDaftarSiswa');
-        this.loading = false; this.listSiswa = res; this.modalSiswa.show = true;
-        if(context === 'tagihan' && this.listKelas.length === 0) this.fetchDaftarKelas();
-      } catch(err) { this.loading = false; }
-    },
-    
-    pilihSiswa(s) {
-      this.searchSiswaInput = s.nama + ' (' + s.nis + ')'; 
-      if(this.modalSiswa.context === 'bayar') {
-        this.formBayar.siswa = s; 
-        this.formBayar.items = [];
-        this.formBayar.metode = 'Tunai';
-        this.formBayar.saldoSiswa = 0;
-        this.fetchSaldoSiswa(s.nama);
-      } else {
-        this.formBuatTagihan.siswa = s;
-      }
-      this.modalSiswa.show = false;
-    },
-
-    async bukaModalJenisTagihan() {
-      if(!this.formBayar.siswa) return;
-      this.loading = true;
-      try {
-        const res = await this.apiCall('getTagihanSiswa', { nis: this.formBayar.siswa.nis });
-        this.loading = false; this.listTagihanAktif = res; this.modalTagihan.show = true;
-      } catch(err) { this.loading = false; }
-    },
-    tambahkanTagihanKeCart(tagihan) {
-      const exists = this.formBayar.items.find(i => i.id === tagihan.id);
-      if(exists) return this.toast('Tagihan sudah masuk!', 'warning');
-      this.formBayar.items.push({ ...tagihan, nilai_bayar: tagihan.sisa });
-      this.modalTagihan.show = false;
-    },
-    async submitPembayaranSiswa() {
-      // Validasi Saldo jika potong tabungan
-      if(this.formBayar.metode === 'Potong Tabungan' && this.totalTagihanCart > this.formBayar.saldoSiswa) {
-          return Swal.fire('Saldo Tidak Mencukupi', 'Sisa saldo tabungan (' + this.formatRp(this.formBayar.saldoSiswa) + ') kurang dari tagihan yang harus dibayar.', 'error');
-      }
-
-      this.loading = true;
-      const payload = { 
-        siswa: this.formBayar.siswa, 
-        invoice: this.formBayar.invoice, 
-        tglBayar: this.formBayar.tglBayar, 
-        metode: this.formBayar.metode,
-        items: this.formBayar.items, 
-        total: this.totalTagihanCart 
-      };
-
-      try {
-        const res = await this.apiCall('prosesPembayaranSiswa', { payload: payload });
-        this.loading = false;
-        if(res.success) { this.toast(res.message); this.modalBayar.show = false; this.fetchHistorySiswa(); }
-        else Swal.fire('Gagal', res.message, 'error');
-      } catch(err) { this.loading = false; Swal.fire('Error', err.message, 'error'); }
-    },
-    
-    async fetchTableData() {
-      this.loading = true;
-      this.expandedTagihan = null;
-      try {
-        const res = await this.apiCall('getModuleData', { moduleName: this.view, role: this.session.role, namaUser: this.session.nama });
-        this.loading = false;
-        if(res.success) {
-          this.tableData = { header: res.header, body: res.body };
-          if(this.view === 'tagihan_siswa' && this.listKelas.length === 0) this.fetchDaftarKelas();
-          
-          if(this.view === 'tabungan' && this.listSiswa.length === 0) {
-             const resSiswa = await this.apiCall('getDaftarSiswa');
-             this.listSiswa = resSiswa;
-          }
-        } else this.tableData = { header: [], body: [] };
-      } catch(err) { this.loading = false; this.tableData = { header: [], body: [] }; }
-    },
-    async loadDashboard() {
-      this.loading = true;
-      try {
-        const res = await this.apiCall('getDashboardStats', { role: this.session.role, namaUser: this.session.nama });
-        this.loading = false;
-        if(res.success) {
-          this.stats = res;
-          this.$nextTick(() => { if(this.view === 'dashboard') this.renderChart(); });
-        }
-      } catch(err) { this.loading = false; }
-    },
-    renderChart() {
-      if (myChart) myChart.destroy();
-      const ctx = document.getElementById('chartIncome');
-      if(ctx && this.stats.chartPendapatan.labels.length > 0) {
-        let chartColors = ['#3498db', '#2ecc71', '#f1c40f', '#e74c3c', '#9b59b6'];
-        if(this.session.role === 'siswa') {
-          chartColors = ['#e74c3c', '#2ecc71'];
-        }
-
-        myChart = new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-            labels: this.stats.chartPendapatan.labels,
-            datasets: [{ data: this.stats.chartPendapatan.data, backgroundColor: chartColors }]
-          },
-          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: {size: 10} } } } }
-        });
-      }
-    },
-    openModal(action, row = null) {
-      this.modal.action = action;
-      if(action === 'edit' && row) {
-        this.modal.identifier = row[0]; 
-        this.modal.formData = [...row];
-      } else {
-        this.modal.identifier = null; 
-        this.modal.formData = new Array(this.tableData.header.length).fill('');
-        
-        if (this.tableData.header.length > 0 && this.tableData.header[0].toLowerCase() === 'no') {
-          let targetArr = this.view === 'pembayaran_siswa' ? this.historyPembayaranSiswa : this.tableData.body;
-          this.modal.formData[0] = targetArr.length > 0 ? Number(targetArr[targetArr.length-1][0]) + 1 : 1;
-        }
-
-        this.tableData.header.forEach((head, i) => {
-          let h = head.toLowerCase();
-          if (h.includes('invoice')) {
-             this.modal.formData[i] = this.generateInvoice();
-          }
-          if (h.includes('tgl') || h.includes('tanggal')) {
-             this.modal.formData[i] = getToday();
-          }
-        });
-      }
-      this.modal.show = true;
-    },
-    async saveData() {
-      this.loading = true;
-      const targetModule = this.view === 'pembayaran_siswa' ? 'pendapatan' : this.view;
-      try {
-        const res = await this.apiCall('crudOperation', { crudAction: this.modal.action, moduleName: targetModule, rowData: this.modal.formData, identifierStr: this.modal.identifier });
-        this.loading = false;
-        if(res.success) {
-          this.modal.show = false; this.toast(res.message);
-          if(this.view === 'pembayaran_siswa') this.fetchHistorySiswa(); else this.fetchTableData();
-        }
-        else Swal.fire('Gagal!', res.message, 'error');
-      } catch(err) { this.loading = false; Swal.fire('Error', err.message, 'error'); }
-    },
-    async deleteData(id, moduleName) {
-      const result = await Swal.fire({ title: 'Hapus Data?', text: "Anda yakin ingin menghapus data ini secara permanen?", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Ya, Hapus!' });
-      if(!result.isConfirmed) return;
-      this.loading = true;
-      try {
-        const res = await this.apiCall('crudOperation', { crudAction: 'delete', moduleName: moduleName, rowData: [], identifierStr: id });
-        this.loading = false;
-        if(res.success) { this.toast(res.message); if(this.view === 'pembayaran_siswa') this.fetchHistorySiswa(); else this.fetchTableData(); }
-      } catch(err) { this.loading = false; }
-    },
-    exportExcel() {
-      if(this.tableData.body.length === 0) return this.toast('Data tidak tersedia', 'warning');
-      const sheetData = this.tableData.body.map(row => {
-        let obj = {}; this.tableData.header.forEach((h, i) => obj[h] = row[i]); return obj;
-      });
-      const ws = XLSX.utils.json_to_sheet(sheetData); const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Data Export"); XLSX.writeFile(wb, `Export_${this.view}_${new Date().getTime()}.xlsx`);
-    }
-  }
+if (this.tableData.header.length > 0 && this.tableData.header[0].toLowerCase() === 'no') {
+let targetArr = this.view === 'pembayaran_siswa' ? this.historyPembayaranSiswa : this.tableData.body;
+this.modal.formData[0] = targetArr.length > 0 ? Number(targetArr[targetArr.length-1][0]) + 1 : 1;
+}
+this.tableData.header.forEach((head, i) => {
+let h = head.toLowerCase();
+if (h.includes('invoice')) {
+this.modal.formData[i] = this.generateInvoice();
+}
+if (h.includes('tgl') || h.includes('tanggal')) {
+this.modal.formData[i] = getToday();
+}
+});
+}
+this.modal.show = true;
+},
+async saveData() {
+this.loading = true;
+const targetModule = this.view === 'pembayaran_siswa' ? 'pendapatan' : this.view;
+try {
+const res = await this.apiCall('crudOperation', { crudAction: this.modal.action, moduleName: targetModule, rowData: this.modal.formData, identifierStr: this.modal.identifier });
+this.loading = false;
+if(res.success) {
+this.modal.show = false; this.toast(res.message);
+if(this.view === 'pembayaran_siswa') this.fetchHistorySiswa(); else this.fetchTableData();
+}
+else Swal.fire('Gagal!', res.message, 'error');
+} catch(err) { this.loading = false; Swal.fire('Error', err.message, 'error'); }
+},
+async deleteData(id, moduleName) {
+const result = await Swal.fire({ title: 'Hapus Data?', text: "Anda yakin ingin menghapus data ini secara permanen?", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Ya, Hapus!' });
+if(!result.isConfirmed) return;
+this.loading = true;
+try {
+const res = await this.apiCall('crudOperation', { crudAction: 'delete', moduleName: moduleName, rowData: [], identifierStr: id });
+this.loading = false;
+if(res.success) { this.toast(res.message); if(this.view === 'pembayaran_siswa') this.fetchHistorySiswa(); else this.fetchTableData(); }
+} catch(err) { this.loading = false; }
+},
+exportExcel() {
+if(this.tableData.body.length === 0) return this.toast('Data tidak tersedia', 'warning');
+const sheetData = this.tableData.body.map(row => {
+let obj = {}; this.tableData.header.forEach((h, i) => obj[h] = row[i]); return obj;
+});
+const ws = XLSX.utils.json_to_sheet(sheetData); const wb = XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(wb, ws, "Data Export"); XLSX.writeFile(wb, `Export_${this.view}_${new Date().getTime()}.xlsx`);
+}
+}
 }).mount('#app');
 </script>
 </body>
