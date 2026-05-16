@@ -342,7 +342,7 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 <tbody>
 <tr v-for="(row, rIdx) in tableData.body" :key="rIdx">
 <td v-for="(cell, cIdx) in row" :key="cIdx">
-<span v-if="(tableData.header[cIdx].toLowerCase().includes('bayar') || tableData.header[cIdx].toLowerCase().includes('tagihan') || tableData.header[cIdx].toLowerCase().includes('jumlah') || tableData.header[cIdx].toLowerCase().includes('utang') || tableData.header[cIdx].toLowerCase().includes('kurang'))" class="fw-bold text-success">{{ formatRp(cell) }}</span>
+<span v-if="(tableData.header[cIdx].toLowerCase().includes('jumlah') || tableData.header[cIdx].toLowerCase().includes('tagihan') || tableData.header[cIdx].toLowerCase().includes('utang') || tableData.header[cIdx].toLowerCase().includes('kurang') || tableData.header[cIdx].toLowerCase().includes('nominal') || (tableData.header[cIdx].toLowerCase().includes('bayar') && !tableData.header[cIdx].toLowerCase().includes('rincian') && !tableData.header[cIdx].toLowerCase().includes('tanggal') && !tableData.header[cIdx].toLowerCase().includes('tgl'))) && !isNaN(Number(cell)) && cell !== ''" class="fw-bold text-success">{{ formatRp(cell) }}</span>
 <span v-else-if="tableData.header[cIdx].toLowerCase().includes('password')" class="text-muted fst-italic">***</span>
 <span v-else>{{ cell }}</span>
 </td>
@@ -671,7 +671,7 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 // =================================================================================
 // MASUKKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI BAWAH INI (Hasil Deploy)
 // =================================================================================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwI3bKZVuzBKYIYSRZ_L62fu3cAFDZVoazTst1Vi01xxWLV2igz0D5aXbz-kUPs1-1E/exec';
+const SCRIPT_URL = 'URL_APPS_SCRIPT_ANDA_DISINI';
 
 let myChart = null;
 const getToday = () => { const d = new Date(); return d.toISOString().split('T')[0]; };
@@ -777,7 +777,6 @@ createApp({
     toggleHistory(nama) { this.expandedHistory = this.expandedHistory === nama ? null : nama; },
     toggleTagihan(nama) { this.expandedTagihan = this.expandedTagihan === nama ? null : nama; },
 
-    // FUNGSI BARU: Auto Format No Invoice INV/YYYYMMDD/XXXXXX
     generateInvoice() {
       const d = new Date();
       const yyyy = d.getFullYear();
@@ -963,11 +962,16 @@ createApp({
       const ctx = document.getElementById('chartIncome');
       if(ctx && this.stats.chartPendapatan.labels.length > 0) {
         let chartColors = ['#3498db', '#2ecc71', '#f1c40f', '#e74c3c', '#9b59b6'];
-        if(this.session.role === 'siswa') chartColors = ['#e74c3c', '#2ecc71'];
+        if(this.session.role === 'siswa') {
+          chartColors = ['#e74c3c', '#2ecc71'];
+        }
 
         myChart = new Chart(ctx, {
           type: 'doughnut',
-          data: { labels: this.stats.chartPendapatan.labels, datasets: [{ data: this.stats.chartPendapatan.data, backgroundColor: chartColors }] },
+          data: {
+            labels: this.stats.chartPendapatan.labels,
+            datasets: [{ data: this.stats.chartPendapatan.data, backgroundColor: chartColors }]
+          },
           options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: {size: 10} } } } }
         });
       }
