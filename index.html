@@ -762,7 +762,7 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 </datalist>
 </div>
 
-<select v-else-if="(head.toLowerCase().includes('kategori') || head.toLowerCase().includes('jenis')) && view === 'pengeluaran'" v-model="modal.formData[i]" class="form-select bg-light">
+<select v-else-if="(head.toLowerCase().includes('kategori') || head.toLowerCase().includes('catatan')) && view === 'pengeluaran'" v-model="modal.formData[i]" class="form-select bg-light">
 <option value="" disabled>Pilih {{ head }}...</option>
 <option v-for="k in listKategoriPengeluaran" :value="k">{{ k }}</option>
 </select>
