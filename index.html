@@ -335,7 +335,7 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 <div class="d-flex gap-2">
 <input type="text" class="form-control form-control-sm" placeholder="Cari Nama/Kelas..." v-model="searchTabungan">
 <button v-if="session.role !== 'siswa'" @click="openModal('add')" class="btn btn-primary btn-sm-custom shadow-sm text-nowrap"><i class="fa-solid fa-circle-plus me-1"></i> Tambah Data</button>
-<button @click="exportExcel" class="btn btn-success btn-sm-custom shadow-sm text-nowrap"><i class="fa-solid fa-file-excel me-1"></i> Export XLSX</button>
+<button @click="exportExcel" class="btn btn-success btn-sm-custom shadow-sm text-nowrap"><i class="fa-solid fa-file-excel me-1"></i> Export</button>
 </div>
 </div>
 <div class="table-responsive">
@@ -385,8 +385,9 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
 <h5 class="fw-bold text-capitalize m-0 mb-3 mb-md-0"><i class="fa-solid fa-table text-primary me-2"></i> Data {{ view.replace('_', ' ') }}</h5>
 <div class="d-flex gap-2">
+<input type="text" class="form-control form-control-sm" placeholder="Ketik pencarian..." v-model="searchTable" style="max-width: 200px;">
 <button v-if="session.role !== 'siswa'" @click="openModal('add')" class="btn btn-primary btn-sm-custom shadow-sm text-nowrap"><i class="fa-solid fa-circle-plus me-1"></i> Tambah Data</button>
-<button @click="exportExcel" class="btn btn-success btn-sm-custom shadow-sm text-nowrap"><i class="fa-solid fa-file-excel me-1"></i> Export XLSX</button>
+<button @click="exportExcel" class="btn btn-success btn-sm-custom shadow-sm text-nowrap"><i class="fa-solid fa-file-excel me-1"></i> Export</button>
 </div>
 </div>
 <div class="table-responsive">
@@ -398,7 +399,7 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 </tr>
 </thead>
 <tbody>
-<tr v-for="(row, rIdx) in tableData.body" :key="rIdx">
+<tr v-for="(row, rIdx) in filteredTableData" :key="rIdx">
 <td v-for="(cell, cIdx) in row" :key="cIdx">
 <span v-if="(tableData.header[cIdx].toLowerCase().includes('jumlah') || tableData.header[cIdx].toLowerCase().includes('tagihan') || tableData.header[cIdx].toLowerCase().includes('utang') || tableData.header[cIdx].toLowerCase().includes('kurang') || tableData.header[cIdx].toLowerCase().includes('nominal') || tableData.header[cIdx].toLowerCase().includes('saldo') || (tableData.header[cIdx].toLowerCase().includes('bayar') && !tableData.header[cIdx].toLowerCase().includes('rincian') && !tableData.header[cIdx].toLowerCase().includes('tanggal') && !tableData.header[cIdx].toLowerCase().includes('tgl'))) && !isNaN(Number(cell)) && cell !== ''" class="fw-bold text-success">{{ formatRp(cell) }}</span>
 <span v-else-if="tableData.header[cIdx].toLowerCase().includes('password')" class="text-muted fst-italic">***</span>
@@ -409,7 +410,7 @@ Login: <span class="fw-bold text-warning text-uppercase"><i class="fa-solid fa-u
 <button @click="deleteData(row[0], view)" class="btn btn-danger btn-action shadow-sm text-white ms-1" title="Hapus"><i class="fa-solid fa-trash-can"></i></button>
 </td>
 </tr>
-<tr v-if="tableData.body.length === 0">
+<tr v-if="filteredTableData.length === 0">
 <td :colspan="tableData.header.length + (session.role === 'admin' ? 1 : 0)" class="text-center text-muted p-4"><i class="fa-solid fa-folder-open fs-2 mb-2 d-block"></i>Data tidak tersedia.</td>
 </tr>
 </tbody>
@@ -826,6 +827,7 @@ cetakData: null, cetakRiwayatData: null, listKelas: [],
 listJenisPendapatan: [], listKategoriPengeluaran: [],
 searchSiswaInput: '',
 searchTabungan: '',
+searchTable: '', // PERBAIKAN: state baru untuk pencarian global
 expandedTabungan: null,
 
 modalBuatTagihan: { show: false },
@@ -910,6 +912,15 @@ if (this.searchTabungan) {
     arr = arr.filter(g => g.nama.toLowerCase().includes(s) || g.kelas.toLowerCase().includes(s));
 }
 return arr;
+},
+
+// PERBAIKAN: Computed properti filter untuk tabel generik
+filteredTableData() {
+  if (!this.searchTable) return this.tableData.body;
+  const s = this.searchTable.toLowerCase();
+  return this.tableData.body.filter(row => {
+    return row.some(cell => String(cell).toLowerCase().includes(s));
+  });
 }
 
 },
@@ -987,6 +998,7 @@ logout() { localStorage.removeItem('erp_session'); this.isLoggedIn = false; this
 go(menu) {
 this.view = menu;
 this.session.lastView = menu;
+this.searchTable = ''; // Bersihkan pencarian saat pindah menu
 localStorage.setItem('erp_session', JSON.stringify(this.session));
 if(window.innerWidth < 768) this.sidebarOpen = false;
 if(menu === 'dashboard') this.loadDashboard();
@@ -1054,7 +1066,7 @@ bukaModalBayar() {
 this.formBayar = { 
     invoice: this.generateInvoice(), tglBayar: getToday(), siswa: null, items: [], 
     metodeBayar: { tunai: 0, transfer: 0, qris: 0, tabungan: 0 }, 
-    saldoSiswa: 0, penerima: this.session.nama
+    saldoSiswa: 0, penerima: this.session.nama 
 };
 this.searchSiswaInput = '';
 this.modalBayar.show = true;
